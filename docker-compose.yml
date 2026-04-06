@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  node-service:
+    image: ubuntu:latest
+    container_name: nexus_node_container
+    restart: always
+    environment:
+      - NODE_ID=38550977 # Твой реальный ID ноды из логов
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
