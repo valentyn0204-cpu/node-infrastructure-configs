@@ -7,23 +7,36 @@ services:
     container_name: nexus_node_service
     restart: always
     environment:
-      - NODE_ID=38550977 # Placeholder ID based on logs
+      - NODE_ID=38550977 
     deploy:
       resources:
         limits:
           memory: 1G
+          cpus: '0.5' # Ограничиваем CPU, чтобы нода не "съела" Sony-сервер
+    healthcheck: # Проверка жизнеспособности процесса
+      test: ["CMD", "ps", "aux", "|", "grep", "nexus"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - node-infrastructure-network
 
   # Grass Node Configuration
   grass-node:
     image: grass-node-image:latest
     container_name: grass_network_service
     restart: unless-stopped
-    network_mode: "host" # Optimization for network-dependent nodes
+    network_mode: "host" 
+    # network_mode: host несовместим с сетями Docker, поэтому блоки ниже игнорируются, но важны для структуры
+    deploy:
+      resources:
+        limits:
+          memory: 512M # Grass обычно ест меньше, экономим ресурсы
     logging:
       driver: "json-file"
       options:
@@ -31,5 +44,6 @@ services:
         max-file: "2"
 
 networks:
-  default:
+  node-infrastructure-network:
+    driver: bridge
     name: node-infrastructure-network
