@@ -1,13 +1,35 @@
 version: '3.8'
+
 services:
-  node-service:
-    image: ubuntu:latest
-    container_name: nexus_node_container
+  # Nexus Node Configuration
+  nexus-node:
+    image: nexus-cli:latest
+    container_name: nexus_node_service
     restart: always
     environment:
-      - NODE_ID=38550977 # Твой реальный ID ноды из логов
+      - NODE_ID=38550977 # Placeholder ID based on logs
+    deploy:
+      resources:
+        limits:
+          memory: 1G
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+  # Grass Node Configuration
+  grass-node:
+    image: grass-node-image:latest
+    container_name: grass_network_service
+    restart: unless-stopped
+    network_mode: "host" # Optimization for network-dependent nodes
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+networks:
+  default:
+    name: node-infrastructure-network
